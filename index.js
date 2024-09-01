@@ -28,9 +28,14 @@ async function run() {
         const productCollection = client.db('neeProkritiDB').collection('products');
 
         // products related apis
-        app.get('/products', async(req, res) => {
+        app.get('/products', async (req, res) => {
             const products = await productCollection.find().toArray();
             res.send(products);
+        });
+
+        app.get('/productCount', async (req, res) => {
+            const count = await productCollection.estimatedDocumentCount();
+            res.send({count});
         });
 
         // Send a ping to confirm a successful connection
