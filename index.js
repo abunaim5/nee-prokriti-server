@@ -41,13 +41,22 @@ async function run() {
                 skip: skip,
                 limit: size,
                 sort: {}
-            }
+            };
+
+            // search related queries
+            const searchText = req.query.search;
+            if (searchText) {
+                query.name = {
+                    $regex: searchText,
+                    $options: 'i'
+                }
+            };
 
             // sort related queries
             const sortPriceVal = req.query.sort;
             switch (sortPriceVal) {
                 case 'default':
-                    options.sort = {};
+                    options.sort = { createdAt: -1 };
                     break;
                 case 'low':
                     options.sort.price = 1;
@@ -56,7 +65,7 @@ async function run() {
                     options.sort.price = -1;
                     break;
                 default:
-                    options.sort = {};
+                    options.sort = { createdAt: -1 };
             };
 
             const products = await productCollection.find(query, options).toArray();
