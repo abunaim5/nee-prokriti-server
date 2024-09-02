@@ -52,6 +52,16 @@ async function run() {
                 }
             };
 
+            // filter related queries
+            const collection = req.query.filter;
+            switch(collection){
+                case 'all':
+                    query = {};
+                    break;
+                default:
+                    query.collection = collection;
+            };
+
             // sort related queries
             const sortPriceVal = req.query.sort;
             switch (sortPriceVal) {
