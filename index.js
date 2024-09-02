@@ -29,13 +29,43 @@ async function run() {
 
         // products related apis
         app.get('/products', async (req, res) => {
-            const products = await productCollection.find().toArray();
+            // pagination related queries
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+            let skip = (page * size) - size;
+
+            // query and options
+            let query = {};
+
+            let options = {
+                skip: skip,
+                limit: size,
+                sort: {}
+            }
+
+            // sort related queries
+            const sortPriceVal = req.query.sort;
+            switch (sortPriceVal) {
+                case 'default':
+                    options.sort = {};
+                    break;
+                case 'low':
+                    options.sort.price = 1;
+                    break;
+                case 'high':
+                    options.sort.price = -1;
+                    break;
+                default:
+                    options.sort = {};
+            };
+
+            const products = await productCollection.find(query, options).toArray();
             res.send(products);
         });
 
         app.get('/productCount', async (req, res) => {
             const count = await productCollection.estimatedDocumentCount();
-            res.send({count});
+            res.send({ count });
         });
 
         // Send a ping to confirm a successful connection
