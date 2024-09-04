@@ -81,13 +81,13 @@ async function run() {
         app.get('/productCount', async (req, res) => {
             let query = {}
 
-            // const searchText = req.query.search;
-            // if (searchText) {
-            //     query.name = {
-            //         $regex: searchText,
-            //         $options: 'i'
-            //     }
-            // };
+            const searchText = req.query.search;
+            if (searchText) {
+                query.name = {
+                    $regex: searchText,
+                    $options: 'i'
+                }
+            };
 
             const collection = req.query.filter;
             if(collection && collection !== 'all'){
