@@ -54,13 +54,9 @@ async function run() {
 
             // filter related queries
             const collection = req.query.filter;
-            switch(collection){
-                case 'all':
-                    query = {};
-                    break;
-                default:
-                    query.collection = collection;
-            };
+            if(collection !== 'all'){
+                query.collection = collection;
+            }
 
             // sort related queries
             const sortPriceVal = req.query.sort;
@@ -83,7 +79,22 @@ async function run() {
         });
 
         app.get('/productCount', async (req, res) => {
-            const count = await productCollection.estimatedDocumentCount();
+            let query = {}
+
+            // const searchText = req.query.search;
+            // if (searchText) {
+            //     query.name = {
+            //         $regex: searchText,
+            //         $options: 'i'
+            //     }
+            // };
+
+            const collection = req.query.filter;
+            if(collection && collection !== 'all'){
+                query.collection = collection;
+            }
+
+            const count = await productCollection.countDocuments(query);
             res.send({ count });
         });
 
