@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, serialize } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -44,17 +44,17 @@ async function run() {
             };
 
             // search related queries
-            const searchText = req.query.search;
-            if (searchText) {
-                query.name = {
-                    $regex: searchText,
-                    $options: 'i'
-                }
-            };
+            // const searchText = req.query.search;
+            // if (searchText) {
+            //     query.name = {
+            //         $regex: searchText,
+            //         $options: 'i'
+            //     }
+            // };
 
             // filter related queries
             const collection = req.query.filter;
-            if(collection !== 'all'){
+            if (collection !== 'all') {
                 query.collection = collection;
             }
 
@@ -78,6 +78,20 @@ async function run() {
             res.send(products);
         });
 
+        app.get('/searchProducts', async (req, res) => {
+            const searchText = req.query.search;
+
+            const query = {
+                name: {
+                    $regex: searchText,
+                    $options: 'i'
+                }
+            };
+
+            const searchResult = await productCollection.find(query).toArray();
+            res.send(searchResult);
+        });
+
         app.get('/productCount', async (req, res) => {
             let query = {}
 
@@ -90,7 +104,7 @@ async function run() {
             };
 
             const collection = req.query.filter;
-            if(collection && collection !== 'all'){
+            if (collection && collection !== 'all') {
                 query.collection = collection;
             }
 
