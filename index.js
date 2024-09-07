@@ -27,7 +27,7 @@ async function run() {
 
         const productCollection = client.db('neeProkritiDB').collection('products');
 
-        // products related apis
+        // find all products related apis
         app.get('/products', async (req, res) => {
             // pagination related queries
             const page = parseInt(req.query.page);
@@ -78,6 +78,33 @@ async function run() {
             res.send(products);
         });
 
+        // find product unique categories related api
+        app.get('/categories', async (req, res) => {
+            try {
+                const pipeline = [
+                    {
+                        $group: {
+                            _id: '$category',
+                            totalProducts: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            category: '$_id',
+                            totalProducts: 1
+                        }
+                    }
+                ]
+
+                const categories = await productCollection.aggregate(pipeline).toArray();
+                res.send(categories);
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
+        // find products with searching related api
         app.get('/searchProducts', async (req, res) => {
             const searchText = req.query.search;
 
@@ -92,6 +119,7 @@ async function run() {
             res.send(searchResult);
         });
 
+        // find total product count related api
         app.get('/productCount', async (req, res) => {
             let query = {}
 
