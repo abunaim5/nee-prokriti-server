@@ -81,7 +81,15 @@ async function run() {
         // find product unique categories related api
         app.get('/categories', async (req, res) => {
             try {
+                const collection = req.query.collection;
+                let $match = {}
+                if (collection !== 'all') {
+                    $match.collection = collection;
+                }
                 const pipeline = [
+                    {
+                        $match
+                    },
                     {
                         $group: {
                             _id: '$category',
